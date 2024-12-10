@@ -1,4 +1,4 @@
-package org.exercises;
+package org.exercises.dataStore;
 
 public class SimpleDB {
     private static double num1 = 10;

@@ -1,12 +1,14 @@
 package org.exercises;
 
-import org.exercises.SimpleDB;
+
+//import org.exercises.dataStore.SimpleDB;
 
 public class SimpleCalculator {
     // Predefined numbers and operations
-    static double num1 = SimpleDB.getNum1(); // First number
-     static double num2 = SimpleDB.getNum2(); // Second number
-
+//    static double num1 = SimpleDB.getNum1(); // First number
+//     static double num2 = SimpleDB.getNum2(); // Second number
+    static double num1 = 10; // First number
+    static double num2 = 5; // Second number
 
     public static void execute() {
 
