@@ -52,7 +52,7 @@ pipeline {
                     dir("${parentDir}") {
                         withCredentials([string(credentialsId: "dockerfred", variable: "dockerfred")]) {
                             bat "docker login -u flaren -p ${dockerfred}"
-                            bat "docker push ${dockerImageName}"
+                            bat "docker push flaren/ms-02:3.0"
                         }
                         }
                    }
