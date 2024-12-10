@@ -1,0 +1,88 @@
+def parentDir = 'maven'
+def dockerImageName = 'flaren/maven-modules'
+
+pipeline {
+    agent any
+
+    tools {
+        maven "default"
+    }
+
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scmGit(
+                    branches: [[name: 'main']],
+                    userRemoteConfigs: [[url: 'https://github.com/aihoon01/JavaALLab4.git']])
+            }
+        }
+         // run tests
+        stage("Clean Install") {
+            steps {
+                dir("${parentDir}") {
+                    bat 'mvn clean install'
+                }
+            }
+            post {
+                success {
+                    echo "[build]: successfully run all tests."
+                }
+                failure {
+                    echo "[build]: Failed build!"
+                }
+            }
+        }
+
+        stage("Build Docker Image") {
+            steps {
+                dir("${parentDir}") {
+                    script {
+                        echo "[Docker Image Build]: Building docker image with the name ${dockerImageName}"
+                        bat "docker build -t ${dockerImageName} ."
+                }
+            }
+        }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    echo "[Docker image ----> Docker Hub...]"
+                    dir("${parentDir}") {
+                        withCredentials([string(credentialsId: "dockerfred", variable: "dockerfred")]) {
+                            bat "docker login -u flaren -p ${dockerfred}"
+                            bat "docker push ${dockerImageName}"
+                        }
+                        }
+                   }
+                }
+
+            post {
+                success {
+                    echo '[Docker-Hub]: Successfully pushed docker image.'
+                }
+                failure {
+                    echo 'Docker-Hub]: Failed to push docker image!'
+                }
+            }
+        }
+        // stage('Deploy to Staging') {
+        //     steps {
+        //         ansiblePlaybook(
+        //             playbook: 'deploy-staging.yml',
+        //             inventory: 'inventory/staging',
+        //             credentialsId: 'ansible-credentials-id'
+        //         )
+        //     }
+        // }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
